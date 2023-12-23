@@ -38,7 +38,10 @@ aws route53 change-resource-record-sets \
     }]
   }
   '
- change the above content as per your requirment
+  
+  
+ change the above content as per your requirment as shown below.
+ 
  
   aws route53 change-resource-record-sets \
     --hosted-zone-id $ZONE_ID \
