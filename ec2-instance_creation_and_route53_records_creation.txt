@@ -1,0 +1,118 @@
+This is document is for creating ec2 instance and route 53 by using aws cli
+-----------------------------------------------------------------------------
+First make sure the role is created and role has been attached to the ec2 server that you are using to run below commands
+ 
+1)instance creation
+
+aws ec2 run-instances --image-id ami-xxxxxxxx --count 1 --instance-type t2.micro --key-name MyKeyPair --security-group-ids sg-903004f8 --subnet-id subnet-6e7f829e
+
+change the ami id and security as per your records
+
+aws ec2 run-instances --image-id ami-03265a0778a880afb --count 1 --instance-type t2.micro --security-group-ids sg-096e94616125ed979 
+
+2) TO specify the name of the servers we need to add tags for the above cmd
+
+aws ec2 run-instances --image-id ami-03265a0778a880afb --count 1 --instance-type t2.micro --security-group-ids sg-096e94616125ed979 --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$i}]"
+
+3) Now if we need ip address to create route 53 record
+
+aws ec2 run-instances --image-id ami-03265a0778a880afb --count 1 --instance-type t2.micro --security-group-ids sg-096e94616125ed979 --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$i}]" --query 'Instances[0].PrivateIpAddress'
+
+4) Now create route 53 records by using aws cli
+
+aws route53 change-resource-record-sets \
+  --hosted-zone-id 1234567890ABC \
+  --change-batch '
+  {
+    "Comment": "Testing creating a record set"
+    ,"Changes": [{
+      "Action"              : "CREATE"
+      ,"ResourceRecordSet"  : {
+        "Name"              : "'" $ENV "'.company.com"
+        ,"Type"             : "CNAME"
+        ,"TTL"              : 120
+        ,"ResourceRecords"  : [{
+            "Value"         : "'" $DNS "'"
+        }]
+      }
+    }]
+  }
+  '
+ change the above content as per your requirment
+ 
+  aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Creating a record set for cognito endpoint"
+        ,"Changes": [{
+        "Action"              : "CREATE"
+        ,"ResourceRecordSet"  : {
+            "Name"              : "'$i'.'$DOMAIN_NAME'"
+            ,"Type"             : "A"
+            ,"TTL"              : 1
+            ,"ResourceRecords"  : [{
+                "Value"         : "'$IP_ADDRESS'"
+            }]
+        }
+        }]
+    }
+        '
+		
+		
+		
+		
+		
+		
+		
+                             So, below is the complete script for the ec2 instance cretaion and creating route 52 records
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+#/bin/bash
+img_id=ami-03265a0778a880afb
+sg_id=sg-096e94616125ed979
+INSTANCES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "web")
+ZONE_ID=Z1024693OKJAW10DDB2X
+DOMAIN_NAME="pavankumarmuvva.online"
+
+
+for i in "${INSTANCES[@]}"
+do
+  if [ $i == "mongodb" ] || [ $i == "shipping" ] || [ $i == "mysql" ]
+    then 
+    Instance_Type="t3.micro"
+    else
+    Instance_Type="t2.micro"
+  fi  
+  IP_ADDRESS=$(aws ec2 run-instances --image-id $img_id --instance-type $Instance_Type --security-group-ids $sg_id --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$i}]" --query 'Instances[0].PrivateIpAddress' --output text)
+  echo "$i::$IP_ADDRESS"
+
+  #create R53 record, make sure you delete existing record
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Creating a record set for cognito endpoint"
+        ,"Changes": [{
+        "Action"              : "CREATE"
+        ,"ResourceRecordSet"  : {
+            "Name"              : "'$i'.'$DOMAIN_NAME'"
+            ,"Type"             : "A"
+            ,"TTL"              : 1
+            ,"ResourceRecords"  : [{
+                "Value"         : "'$IP_ADDRESS'"
+            }]
+        }
+        }]
+    }
+        '
+done
+
+
+
+
+							 
+							 
+ 
+ 
+
+
