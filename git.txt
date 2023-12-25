@@ -1,0 +1,50 @@
+   								git
+------------------------------------------------------------------------------------------------------------------------------------------------
+version control system/version controlling
+
+The first thing we need to talk about version control system.
+
+Version control system is nothing but we can manage multiple versions of our code. It will helps delevopers to track their chnages in there code.
+
+
+centrolized repository and Distributed repository
+-----------------------------------------
+Centolized repository is nothing but it maintain only one repsoitory and if something happen with the centrolized repository, then it will be huge problem.
+
+cvs and svn will comes under Centorilzed repository
+
+Disrtibuted Repository is nothing but we can have multiple copy of the repository in localy. Even if the original repository is down, we still can have a copy of orginal repository. 
+
+Git will comes under Distributed repository. It is a open source.
+
+
+
+
+
+
+
+git command
+#############################
+
+If you need to push code from your local machine to your git hub repository
+
+git init------------> intialiase 
+
+git add <file name> 
+
+git commit -m "first commit" -----------> commit 
+
+git remote add origin https://github.com/Mynameispa1/mytestrepopublic.git  ----------> add github repository to the local machine. It is nothing but your system has to know where the github is located.
+
+git push -u origin master --------> Now push the code into your git hub repository
+
+
+
+Interview questions
+-------------------
+What is Fork
+Fork is nothing but we can create entire copy of a original source/original repository 
+
+what is the difference between Git and Git hub
+Git hub fundamentally using same concept of git and also improvising the existing git.
+ 

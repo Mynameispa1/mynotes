@@ -1,0 +1,5 @@
+$? to check whether the previuos executed command is success or not (0 is success, other then 0 is failed)
+$0 to copy the script name... (If we want to use the script name in script then we simply use $0)
+$# How many arguments passed (Total number of arguments count)
+$@ To pass all the arguments
+
